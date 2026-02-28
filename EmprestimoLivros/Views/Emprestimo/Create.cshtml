@@ -1,0 +1,26 @@
+﻿@model EmprestimoLivros.Models.Livro
+
+<h2 style="color:hotpink;text-align:center;">➕📚 Cadastrar Livro 💖</h2>
+
+<form asp-action="Create" method="post" style="background:#ffe6f2;padding:20px;border-radius:15px;">
+
+    <label>📖 Nome:</label><br />
+    <input asp-for="Nome" /><br /><br />
+
+    <label>🎭 Genero:</label><br />
+    <input asp-for="Genero" /><br /><br />
+
+    <label>📅 Data Compra:</label><br />
+    <input asp-for="DataCompra" type="date" /><br /><br />
+
+    <label>⭐ Status:</label><br />
+    <select asp-for="Status">
+        <option>Pausado</option>
+        <option>Concluido</option>
+    </select><br /><br />
+
+    <button type="submit" style="background:hotpink;color:white;padding:10px 20px;border:none;border-radius:10px;">
+        💾 Salvar
+    </button>
+
+</form>

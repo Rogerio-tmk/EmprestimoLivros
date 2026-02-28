@@ -1,0 +1,308 @@
+﻿@model List<EmprestimoLivros.Models.Livro>
+
+@{
+    var lista = Model ?? new List<EmprestimoLivros.Models.Livro>();
+
+    var total = lista.Count;
+    var pausados = lista.Count(x => x.Status == "Pausado");
+    var concluidos = lista.Count(x => x.Status == "Concluido" || x.Status == "Concluído");
+    var andamento = lista.Count(x => x.Status == "Em andamento");
+
+    var q = Context.Request.Query["busca"].ToString();
+}
+
+<div class="wrap">
+
+    <header class="top">
+        <div class="title">
+            <h1>🐱 Cantinho de Leitura</h1>
+            <p>Fofo, simples e funcionando 💕</p>
+        </div>
+
+        <div class="cat-badge" title="Gatinho bibliotecário">🐱📚</div>
+    </header>
+
+    <section class="stats">
+        <div class="stat">📚 Total <b>@total</b></div>
+        <div class="stat">📖 Em andamento <b>@andamento</b></div>
+        <div class="stat">😴 Pausados <b>@pausados</b></div>
+        <div class="stat">✅ Concluídos <b>@concluidos</b></div>
+    </section>
+
+    <section class="panel">
+        <form method="get" class="search">
+            <input name="busca" value="@q" placeholder="🔎 Buscar por título ou autor..." />
+            <button type="submit" class="btn">Buscar</button>
+        </form>
+
+        <form asp-action="Add" method="post" class="add">
+            @Html.AntiForgeryToken()
+
+            <input name="titulo" placeholder="📚 Título do livro" />
+            <input name="autor" placeholder="✍️ Autor" />
+
+            <select name="status">
+                <option selected>Em andamento</option>
+                <option>Pausado</option>
+                <option>Concluido</option>
+            </select>
+
+            <button type="submit" class="btn">Adicionar</button>
+        </form>
+    </section>
+
+    @if (!lista.Any())
+    {
+        <div class="empty">
+            <h2>Nenhum livro ainda 🥺</h2>
+            <p>Adicione um livro ali em cima.</p>
+        </div>
+    }
+    else
+    {
+        <section class="grid">
+            @foreach (var l in lista)
+            {
+                var status = (l.Status ?? "").Trim();
+                var icon = status == "Pausado" ? "😴" : (status == "Em andamento" ? "📖" : ((status == "Concluido" || status == "Concluído") ? "✅" : "📚"));
+
+                <article class="card">
+                    <div class="paw">🐾</div>
+                    <h3>@l.Titulo</h3>
+                    <p class="muted">@l.Autor</p>
+
+                    <span class="stamp">@icon @status</span>
+
+                    <form asp-action="MudarStatus" method="post" class="statusForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@l.Id" />
+
+                        <select name="status">
+                            <option selected="@(status == "Em andamento")">Em andamento</option>
+                            <option selected="@(status == "Pausado")">Pausado</option>
+                            <option selected="@(status == "Concluido" || status == "Concluído")">Concluido</option>
+                        </select>
+
+                        <button type="submit" class="btn dark">Salvar</button>
+                    </form>
+                </article>
+            }
+        </section>
+    }
+</div>
+
+<style>
+    :root {
+        --bg1: #ffd6ec;
+        --bg2: #e6d6ff;
+        --pink: #ff74b8;
+        --pink2: #ffd1ea;
+        --card: rgba(255,255,255,.82);
+        --line: rgba(255,116,184,.28);
+        --muted: #6b6b6b;
+        --shadow: 0 18px 55px rgba(31,31,31,.12);
+    }
+
+    body {
+        background: radial-gradient(1200px 600px at 10% 10%, var(--bg1), transparent 60%), radial-gradient(1200px 600px at 90% 20%, var(--bg2), transparent 60%), linear-gradient(120deg,#fff,#fff0);
+        min-height: 100vh;
+        font-family: system-ui, -apple-system, Segoe UI, Arial;
+    }
+
+    .wrap {
+        max-width: 1100px;
+        margin: 28px auto;
+        padding: 0 14px;
+    }
+
+    .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+    }
+
+    .title h1 {
+        margin: 0;
+        font-size: 30px;
+    }
+
+    .title p {
+        margin: 6px 0 0;
+        color: var(--muted);
+    }
+
+    .cat-badge {
+        width: 64px;
+        height: 64px;
+        display: grid;
+        place-items: center;
+        border-radius: 22px;
+        background: rgba(255,255,255,.9);
+        border: 1px solid rgba(0,0,0,.08);
+        box-shadow: 0 12px 30px rgba(31,31,31,.10);
+        font-size: 24px;
+        transition: .2s;
+    }
+
+        .cat-badge:hover {
+            transform: translateY(-2px) rotate(-2deg);
+        }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0,1fr));
+        gap: 10px;
+        margin: 14px 0;
+    }
+
+    .stat {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 10px 12px;
+        box-shadow: 0 10px 30px rgba(31,31,31,.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 16px;
+        box-shadow: 0 12px 35px rgba(31,31,31,.10);
+        margin-bottom: 14px;
+    }
+
+    .search {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+        .search input {
+            flex: 1;
+            padding: 12px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,.08);
+            background: rgba(255,255,255,.92);
+            outline: none;
+        }
+
+    .add {
+        display: grid;
+        grid-template-columns: 1fr 1fr 200px 140px;
+        gap: 10px;
+    }
+
+        .add input, .add select {
+            padding: 12px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,.08);
+            background: rgba(255,255,255,.92);
+            outline: none;
+        }
+
+    .btn {
+        border: 0;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--pink), #ff9ad1);
+        color: white;
+        font-weight: 800;
+        cursor: pointer;
+        padding: 12px 16px;
+        transition: .18s;
+    }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn.dark {
+            background: #1f1f1f;
+        }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+    }
+
+    .card {
+        position: relative;
+        background: var(--card);
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 26px;
+        padding: 16px;
+        box-shadow: 0 16px 40px rgba(31,31,31,.10);
+        transition: .18s;
+    }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 22px 55px rgba(31,31,31,.14);
+        }
+
+    .paw {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+    }
+
+    .card h3 {
+        margin: 0 0 4px;
+        color: #ff4fa3;
+    }
+
+    .muted {
+        margin: 0 0 10px;
+        color: var(--muted);
+    }
+
+    .stamp {
+        display: inline-block;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-weight: 800;
+        border: 1px solid rgba(0,0,0,.06);
+        background: rgba(255,255,255,.9);
+        margin-bottom: 10px;
+    }
+
+    .statusForm {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+        .statusForm select {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,.08);
+            background: rgba(255,255,255,.92);
+            outline: none;
+        }
+
+    .empty {
+        background: var(--card);
+        border: 1px dashed var(--line);
+        border-radius: 22px;
+        padding: 22px;
+        text-align: center;
+        color: var(--muted);
+        box-shadow: 0 12px 35px rgba(31,31,31,.10);
+    }
+
+        .empty h2 {
+            margin: 0 0 6px;
+            color: #1f1f1f;
+        }
+</style>

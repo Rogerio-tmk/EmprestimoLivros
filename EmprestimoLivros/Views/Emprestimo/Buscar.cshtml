@@ -1,0 +1,23 @@
+﻿@model List<EmprestimoLivros.ViewModels.LivroBuscaVM>
+
+<h2>Buscar livros</h2>
+
+<form method="get">
+    <input name="nome" placeholder="Ex: Harry Potter..." />
+    <button type="submit">Buscar</button>
+</form>
+
+@if (Model != null && Model.Count > 0)
+{
+    foreach (var l in Model)
+    {
+        <div style="margin:10px 0">
+            <img src="@l.CapaUrl" width="100" />
+            <b>@l.Titulo</b> - @l.Autor
+        </div>
+    }
+}
+else
+{
+    <p>Digite um nome e clique em Buscar.</p>
+}

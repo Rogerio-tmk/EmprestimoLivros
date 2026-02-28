@@ -1,0 +1,57 @@
+﻿@model EmprestimoLivros.Models.Livro
+
+@{
+    ViewData["Title"] = "Cadastrar Livro";
+}
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<div class="bg-overlay">
+    <div class="shell">
+
+        <div class="add-head">
+            <h1 class="add-title">📚 Cadastrar Livro</h1>
+            <p class="add-sub">Preencha os dados 💖</p>
+        </div>
+
+        <div class="add-card">
+            <form asp-controller="Home" asp-action="Add" method="post" class="add-form">
+                @Html.AntiForgeryToken()
+
+                <div class="row">
+                    <div class="field">
+                        <label>Nome do livro</label>
+                        <input class="add-input" asp-for="Nome" placeholder="Ex: Harry Potter" required />
+                    </div>
+
+                    <div class="field">
+                        <label>Gênero</label>
+                        <input class="add-input" asp-for="Genero" placeholder="Ex: Fantasia" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label>Status</label>
+                        <select class="add-input" asp-for="Status">
+                            <option value="Em andamento">Em andamento</option>
+                            <option value="Pausado">Pausado</option>
+                            <option value="Concluido">Concluido</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Data da compra</label>
+                        <input class="add-input" asp-for="DataCompra" type="date" />
+                    </div>
+                </div>
+
+                <div class="add-actions">
+                    <a class="add-btn ghost" href="/Home/Index">⬅ Voltar</a>
+                    <button class="add-btn pink" type="submit">💖 Salvar Livro</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>

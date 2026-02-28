@@ -1,0 +1,150 @@
+﻿@model List<EmprestimoLivros.Models.Livro>
+
+@{
+    ViewData["Title"] = "Biblioteca";
+
+    var total = Model?.Count ?? 0;
+    var andamento = Model?.Count(x => x.Status == "Em andamento") ?? 0;
+    var pausados = Model?.Count(x => x.Status == "Pausado") ?? 0;
+    var concluidos = Model?.Count(x => x.Status == "Concluido" || x.Status == "Concluído") ?? 0;
+
+    string Badge(string status)
+    {
+        status = (status ?? "").ToLower();
+        if (status.Contains("concl")) return "ok";
+        if (status.Contains("paus")) return "pause";
+        return "run";
+    }
+
+    string TextoStatus(string status)
+    {
+        if (status == "Concluido" || status == "Concluído") return "✅ Concluído";
+        if (status == "Pausado") return "⏸️ Pausado";
+        return "📌 Em andamento";
+    }
+}
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<div class="bg-overlay">
+    <div class="shell">
+
+        <div class="header">
+            <div class="brand">
+                <h1><span class="logo">📚</span> Biblioteca da Winne</h1>
+                <p>Seu cantinho fofo e moderno pra organizar livros 💖!</p>
+            </div>
+
+            <a class="btn-top" href="/Home/Add">
+                <span style="font-size:20px;font-weight:1000;">＋</span> Novo livro
+            </a>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="top"><span>TOTAL</span><span class="icon">📚</span></div>
+                <div class="value">@total</div>
+            </div>
+            <div class="stat">
+                <div class="top"><span>EM ANDAMENTO</span><span class="icon">📌</span></div>
+                <div class="value">@andamento</div>
+            </div>
+            <div class="stat">
+                <div class="top"><span>PAUSADOS</span><span class="icon">⏸️</span></div>
+                <div class="value">@pausados</div>
+            </div>
+            <div class="stat">
+                <div class="top"><span>CONCLUÍDOS</span><span class="icon">✅</span></div>
+                <div class="value">@concluidos</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <input id="q" class="input" type="text" placeholder="Buscar por nome..." />
+            <select id="status" class="select">
+                <option value="Todos">Todos</option>
+                <option value="Em andamento">Em andamento</option>
+                <option value="Pausado">Pausados</option>
+                <option value="Concluido">Concluídos</option>
+            </select>
+
+            <button class="btn btn-pink" type="button" onclick="applyFilter()">🔎 Filtrar</button>
+            <button class="btn btn-ghost" type="button" onclick="clearFilter()">🧼 Limpar</button>
+        </div>
+
+        <div class="grid" id="grid">
+            @foreach (var livro in (Model ?? new List<EmprestimoLivros.Models.Livro>()))
+            {
+                <div class="card"
+                     data-title="@((livro.Nome ?? "").ToLower())"
+                     data-status="@(livro.Status ?? "Em andamento")">
+
+                    <div class="ribbon">WINNE</div>
+
+                    <div class="card-head">
+                        <div class="book-icon">📚</div>
+
+                        <div style="flex:1;">
+                            <h3 class="title">@livro.Nome</h3>
+
+                            <div class="meta">
+                                <div class="line">🧁 <span>@(livro.Genero ?? "fantasia")</span></div>
+                                <div class="line">
+                                    📅 <span>@livro.DataCompra.ToString("dd/MM/yyyy")</span>
+                                    <span class="badge @Badge(livro.Status)">
+                                        @TextoStatus(livro.Status)
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="actions">
+                                <a class="btn-mini btn-new" href="/Home/Add">＋ Novo</a>
+
+                                <!-- ✅ EXCLUIR FUNCIONANDO (POST) -->
+                                <form asp-controller="Home"
+                                      asp-action="Excluir"
+                                      asp-route-id="@livro.Id"
+                                      method="post"
+                                      style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-mini btn-del"
+                                            type="submit"
+                                            onclick="return confirm('Tem certeza que quer excluir?');">
+                                        🗑️ Excluir
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+<a class="fab" href="/Home/Add">＋ Cadastrar</a>
+
+<script>
+    function applyFilter(){
+      const q = (document.getElementById('q').value || '').trim().toLowerCase();
+      const st = document.getElementById('status').value;
+
+      document.querySelectorAll('#grid .card').forEach(card=>{
+        const title = card.getAttribute('data-title') || '';
+        const status = card.getAttribute('data-status') || 'Em andamento';
+
+        const okTitle = !q || title.includes(q);
+        const okStatus = (st === 'Todos') || (status === st);
+
+        card.style.display = (okTitle && okStatus) ? '' : 'none';
+      });
+    }
+
+    function clearFilter(){
+      document.getElementById('q').value = '';
+      document.getElementById('status').value = 'Todos';
+      applyFilter();
+    }
+</script>
