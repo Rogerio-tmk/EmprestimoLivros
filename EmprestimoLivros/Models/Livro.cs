@@ -1,28 +1,22 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EmprestimoLivros.Models
 {
+    [Table("livros", Schema = "public")]
     public class Livro
     {
-        public int Id { get; set; }
-        public string Nome { get; set; } = "";
-        public string Genero { get; set; } = "";
-        public DateTime DataCompra { get; set; } = DateTime.Now;
-        public string Status { get; set; } = "Em andamento";
+        [Key]
+        [Column("id")]
+        public long Id { get; set; }
 
-        [NotMapped]
-        public string Titulo
-        {
-            get => Nome;
-            set => Nome = value ?? "";
-        }
+        [Column("nome")]
+        public string? Nome { get; set; }
 
-        [NotMapped]
-        public string Autor
-        {
-            get => Genero;
-            set => Genero = value ?? "";
-        }
+        [Column("autor")]
+        public string? Autor { get; set; }
+
+        [Column("status")]
+        public string? Status { get; set; }
     }
 }

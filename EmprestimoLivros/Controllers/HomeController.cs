@@ -1,6 +1,6 @@
-﻿using EmprestimoLivros.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using EmprestimoLivros.Data;
 using EmprestimoLivros.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
 namespace EmprestimoLivros.Controllers
@@ -14,38 +14,34 @@ namespace EmprestimoLivros.Controllers
             _context = context;
         }
 
+        // ===== LISTA =====
         public IActionResult Index()
         {
             var livros = _context.Livros.ToList();
             return View(livros);
         }
 
+        // ===== ABRIR PAGINA ADD =====
+        [HttpGet]
         public IActionResult Add()
         {
             return View();
         }
 
+        // ===== SALVAR ADD =====
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Add(Livro livro)
+        public IActionResult Add(string titulo, string autor, string status)
         {
+            var livro = new Livro
+            {
+                Nome = titulo,
+                Autor = autor,
+                Status = status
+            };
+
             _context.Livros.Add(livro);
             _context.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
-        // ✅ EXCLUIR
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Excluir(int id)
-        {
-            var livro = _context.Livros.Find(id);
-
-            if (livro != null)
-            {
-                _context.Livros.Remove(livro);
-                _context.SaveChanges();
-            }
 
             return RedirectToAction("Index");
         }

@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: emprestimo-livros
+    runtime: dotnet
+    buildCommand: dotnet publish EmprestimoLivros/EmprestimoLivros.csproj -c Release -o out
+    startCommand: dotnet out/EmprestimoLivros.dll

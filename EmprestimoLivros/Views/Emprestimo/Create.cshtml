@@ -1,26 +1,33 @@
 ﻿@model EmprestimoLivros.Models.Livro
 
-<h2 style="color:hotpink;text-align:center;">➕📚 Cadastrar Livro 💖</h2>
+@{
+    ViewData["Title"] = "Adicionar Livro";
+}
 
-<form asp-action="Create" method="post" style="background:#ffe6f2;padding:20px;border-radius:15px;">
+<h2>Adicionar Livro</h2>
 
-    <label>📖 Nome:</label><br />
-    <input asp-for="Nome" /><br /><br />
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
 
-    <label>🎭 Genero:</label><br />
-    <input asp-for="Genero" /><br /><br />
+    <div style="margin-bottom:10px;">
+        <label asp-for="Nome"></label><br />
+        <input asp-for="Nome" class="form-control" />
+    </div>
 
-    <label>📅 Data Compra:</label><br />
-    <input asp-for="DataCompra" type="date" /><br /><br />
+    <div style="margin-bottom:10px;">
+        <label asp-for="Autor"></label><br />
+        <input asp-for="Autor" class="form-control" />
+    </div>
 
-    <label>⭐ Status:</label><br />
-    <select asp-for="Status">
-        <option>Pausado</option>
-        <option>Concluido</option>
-    </select><br /><br />
+    <div style="margin-bottom:10px;">
+        <label asp-for="Status"></label><br />
+        <select asp-for="Status" class="form-control">
+            <option>Em andamento</option>
+            <option>Pausado</option>
+            <option>Concluido</option>
+        </select>
+    </div>
 
-    <button type="submit" style="background:hotpink;color:white;padding:10px 20px;border:none;border-radius:10px;">
-        💾 Salvar
-    </button>
-
+    <button type="submit">Salvar</button>
+    <a asp-action="Index">Voltar</a>
 </form>
